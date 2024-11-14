@@ -3,6 +3,7 @@ import { Router } from 'express'
 import { StatusCodes } from 'http-status-codes'
 
 import * as db from '../db/pins.db-fn-calls.ts'
+import { Pin, PinData } from '../../models/pins.models.ts'
 
 const router = Router()
 
@@ -66,5 +67,21 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
+router.patch('/:id', async (req, res) => {
+  const id = +req.params.id
+  const updateData: PinData = req.body
+  try {
+    const patchedPin: Pin = await db.updatePin({ id: id, ...updateData })
+    
+    if (patchedPin) {
+      res.status(200).json({ message: 'Pin updated successfully', pin: patchedPin });
+    } else {
+      res.status(404).json({ message: 'Pin not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while updating the pin' });
+  }
+})
 
 export default router

@@ -2,13 +2,13 @@ import db from './connection.ts'
 import { Pin, PinData } from '../../models/pins.models.ts'
 
 export async function getAllPins() {
-  const fruit = await db('pins').select()
-  return fruit as Pin[]
+  const pins = await db('pins').select()
+  return pins as Pin[]
 }
 
 export async function getPinById(id: number | string) {
-  const fruit = await db('pins').select().first().where({ id })
-  return fruit as Pin
+  const pin = await db('pins').select().first().where({ id })
+  return pin as Pin
 }
 
 export async function addPin(data: PinData) {
@@ -18,4 +18,12 @@ export async function addPin(data: PinData) {
 
 export async function deletePinById(id: number) {
     return await db('pins').where({id}).del() 
+}
+
+export async function updatePin(pin: Pin){
+  const [updatedPin] = await db('pins')
+    .where({ id: pin.id })
+    .update(pin)
+    .returning('*')
+  return updatedPin
 }
