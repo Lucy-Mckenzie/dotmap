@@ -5,21 +5,32 @@ import {
   MutationFunction,
 } from '@tanstack/react-query'
 import request from 'superagent'
-import { getPins } from '../apis/pins-api.ts'
 import { Pin, PinData } from '../../models/pins.models.ts'
-import { getPinById } from '../../server/db/pins.db-fn-calls.ts'
+import { getAllPins } from '../apis/pins-api'
+
+// export function usePins() {
+//   try {
+//     return useQuery({
+//       queryKey: ['pins'],
+//       queryFn: async () => {
+//         const result = await request.get('/api/v1/pins')
+//         return result
+//       },
+//     })
+//   } catch (error) {
+//     return []
+//   }
+// }
 
 export function usePins() {
-  const query = useQuery({ queryKey: ['pins'], queryFn: getPins })
-  return {
-    ...query,
-    // Extra queries go here e.g. addFruit: useAddFruit()
-  }
+  return useQuery({
+    queryKey: ['pins'],
+    queryFn: () => getAllPins(),
+  })
 }
 
-
 export function usePinsMutation<TData = unknown, TVariables = unknown>(
-  mutationFn: MutationFunction<TData, TVariables>
+  mutationFn: MutationFunction<TData, TVariables>,
 ) {
   const queryClient = useQueryClient()
   const mutation = useMutation({
@@ -43,13 +54,13 @@ export function useAddPin() {
   })
 }
 
-export function usePinById(id: number) {
-  return useQuery<Pin, Error>({
-    queryKey: ['pins', id],
-    queryFn: () => getPinById(id),
-    enabled: !!id
-  })
-}
+// export function usePinById(id: number) {
+//   return useQuery<Pin, Error>({
+//     queryKey: ['pins', id],
+//     queryFn: () => getPinById(id),
+//     enabled: !!id
+//   })
+// }
 
 export function useDeletePin() {
   const queryClient = useQueryClient()

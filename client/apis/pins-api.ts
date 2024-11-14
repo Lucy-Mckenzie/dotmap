@@ -1,9 +1,7 @@
 import request from 'superagent'
+import { Pin } from '../../models/pins.models'
 
-const rootUrl = '/api/v1'
-
-export function getPins(): Promise<string[]> {
-  return request.get(rootUrl + '/pins').then((res) => {
-    return res.body.pins
-  })
+export async function getAllPins() {
+  const result = await request.get('/api/v1/pins')
+  return result.body as Pin[]
 }
