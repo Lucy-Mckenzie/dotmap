@@ -21,6 +21,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const pin = await db.getPinById(req.params.id)
+    if (!pin){ throw new Error}
     res.json(pin)
   } catch (err) {
     next(err)
@@ -44,12 +45,26 @@ router.post('/', async (req, res) => {
     const id = await db.addPin({ lat, long, name, description, user })
     res
       .setHeader('Location', `${req.baseUrl}/${id}`)
-      .sendStatus(StatusCodes.CREATED)
+      .status(StatusCodes.CREATED).json(id)
   } catch (err) {
     console.error('unknown error')
     res.status(500)
     //next(err) //uncomment with the addition of AuthZ
   }
 })
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    await db.deletePinById(Number(id))
+    res.sendStatus(200)
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message)
+    } else console.error('unknown error')
+    res.sendStatus(500)
+  }
+})
+
 
 export default router
