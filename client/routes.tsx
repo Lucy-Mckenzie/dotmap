@@ -1,3 +1,3 @@
 import { createRoutesFromElements, Route } from 'react-router-dom'
-import App from './components/App.tsx'
+import App from './App.tsx'
 export default createRoutesFromElements(<Route index element={<App />} />)
