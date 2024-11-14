@@ -1,14 +1,17 @@
-/**
- * @param {import('knex').Knex} knex
- */
-export async function up(knex) {
-  return knex.schema.createTable('fruit', (table) => {
-    table.increments('id')
-    table.string('name')
-    table.string('owner').defaultTo(null)
+export const up = async function(knex) {
+  await knex.schema.createTable('pins', (table) => {
+      table.increments('id').primary()
+      table.float('lat').notNullable()
+      table.float('long').notNullable()
+      table.string('name')
+      table.string('description')
   })
 }
 
-export async function down(knex) {
-  return knex.schema.dropTable('fruit')
+/**
+* @param { import("knex").Knex } knex
+* @returns { Promise<void> }
+*/
+export const down = async function(knex) {
+  await knex.schema.dropTableIfExists('pins')
 }
