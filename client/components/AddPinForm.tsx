@@ -51,6 +51,8 @@ function AddPinForm() {
           <label htmlFor="description">Description:</label>
           <input type="text" id="description" name="description" value={formData.description} onChange={handleChange} />
         </div>
+
+        {/* vv this stuff will eventually be added automatically from the other things */}
         <div className="form-group">
           <label htmlFor="lat">Latitude:</label>
           <input type="number" id="lat" name="lat" value={formData.lat} onChange={handleChange} />
@@ -63,6 +65,8 @@ function AddPinForm() {
           <label htmlFor="user">User :</label>
           <input type="text" id="user" name="user" value={formData.user} onChange={handleChange} />
         </div>
+        {/* ^^ end of stuff to be eventually added automatically */}
+
         <button type="submit">Save</button>
       </form>
     </div>
