@@ -21,7 +21,9 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const pin = await db.getPinById(req.params.id)
-    if (!pin){ throw new Error('Pin not found')}
+    if (!pin) {
+      throw new Error('Pin not found')
+    }
     res.json(pin)
   } catch (err) {
     next(err)
@@ -29,27 +31,38 @@ router.get('/:id', async (req, res, next) => {
 })
 
 router.post('/', async (req, res) => {
-//ToDoLater: AuthZ
-// router.post('/', checkJwt, async (req: JwtRequest, res, next) => {
+  //ToDoLater: AuthZ
+  // router.post('/', checkJwt, async (req: JwtRequest, res, next) => {
   // if (!req.auth?.sub) {
   //   res.sendStatus(StatusCodes.UNAUTHORIZED)
   //   return
   // }
+
   try {
     const { lat, long, name, description, user } = req.body
-    if (!lat || !long ) {
-      return res.sendStatus(StatusCodes.BAD_REQUEST);
-    }
-
     const id = await db.addPin({ lat, long, name, description, user })
-    res
-      .setHeader('Location', `${req.baseUrl}/${id}`)
-      .status(StatusCodes.CREATED).json(id)
-  } catch (err) {
-    console.error('unknown error')
-    res.status(500)
-    //next(err) //uncomment with the addition of AuthZ
+
+    return res.json({ id })
+  } catch (error) {
+    return res.json({ message: 'error' })
   }
+
+  // try {
+  //   const { lat, long, name, description, user } = req.body
+  //   if (!lat || !long) {
+  //     return res.sendStatus(StatusCodes.BAD_REQUEST)
+  //   }
+
+  //   const id = await db.addPin({ lat, long, name, description, user })
+  //   res
+  //     .setHeader('Location', `${req.baseUrl}/${id}`)
+  //     .status(StatusCodes.CREATED)
+  //     .json(id)
+  // } catch (err) {
+  //   console.error('unknown error')
+  //   res.status(500)
+  //   //next(err) //uncomment with the addition of AuthZ
+  // }
 })
 
 router.delete('/:id', async (req, res) => {
@@ -70,20 +83,23 @@ router.patch('/:id', async (req, res) => {
   const updateData: PinData = req.body
   try {
     const patchedPin: Pin = await db.updatePin({ id: id, ...updateData })
-    
+
     if (patchedPin) {
-      res.status(200).json({ message: 'Pin updated successfully', pin: patchedPin });
+      res
+        .status(200)
+        .json({ message: 'Pin updated successfully', pin: patchedPin })
     } else {
-      res.status(404).json({ message: 'Pin not found' });
+      res.status(404).json({ message: 'Pin not found' })
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'An error occurred while updating the pin' });
+    console.error(error)
+    res
+      .status(500)
+      .json({ message: 'An error occurred while updating the pin' })
   }
 })
 
 router.get('/user/:username', async (req, res) => {
-
   try {
     const pins = await db.getPinsByUser(req.params.username)
 
@@ -94,7 +110,5 @@ router.get('/user/:username', async (req, res) => {
     res.status(500).json({ message: 'Something went wrong' })
   }
 })
-
-
 
 export default router

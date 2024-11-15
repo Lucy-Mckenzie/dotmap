@@ -47,14 +47,14 @@ export function usePinByUser(user: string) {
   })
 }
 
-export function useAddPin(id: number) {
+export function useAddPin() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (pin: PinData) => {
       await request.post('/api/v1/pins').send(pin)
     },
     onSuccess: async () => {
-      queryClient.invalidateQueries({ queryKey: ['pins', id] })
+      queryClient.invalidateQueries({ queryKey: ['pins'] })
     },
   })
 }
