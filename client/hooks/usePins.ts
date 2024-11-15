@@ -1,66 +1,63 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  MutationFunction,
-} from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import request from 'superagent'
 import { Pin, PinData } from '../../models/pins.models.ts'
-import { getAllPins } from '../apis/pins-api'
-
-// export function usePins() {
-//   try {
-//     return useQuery({
-//       queryKey: ['pins'],
-//       queryFn: async () => {
-//         const result = await request.get('/api/v1/pins')
-//         return result
-//       },
-//     })
-//   } catch (error) {
-//     return []
-//   }
-// }
 
 export function usePins() {
   return useQuery({
     queryKey: ['pins'],
-    queryFn: () => getAllPins(),
-  })
-}
-
-export function usePinsMutation<TData = unknown, TVariables = unknown>(
-  mutationFn: MutationFunction<TData, TVariables>,
-) {
-  const queryClient = useQueryClient()
-  const mutation = useMutation({
-    mutationFn,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pins'] })
+    queryFn: async () => {
+      try {
+        const result = await request.get('/api/v1/pins')
+        return result.body as Pin[]
+      } catch (error) {
+        console.error('Error fetching pins:', error)
+        return []
+      }
     },
   })
-  return mutation
 }
 
-export function useAddPin() {
+export function usePinById(id: number) {
+  return useQuery({
+    queryKey: ['pins', id],
+    queryFn: async () => {
+      try {
+        const result = await request.get(`/api/v1/pins/${id}`)
+        return result.body as Pin
+      } catch (error) {
+        console.error('Error fetching pin:', error)
+        return null
+      }
+    },
+  })
+}
+
+export function usePinByUser(user: string) {
+  return useQuery({
+    queryKey: ['pins', 'user', user],
+    queryFn: async () => {
+      try {
+        const result = await request.get(`/api/v1/pins/user/${user}`)
+        return result.body as Pin[]
+      } catch (error) {
+        console.error('Error fetching pins:', error)
+        return []
+      }
+    },
+  })
+}
+
+export function useAddPin(id: number) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (pin: PinData) => {
       await request.post('/api/v1/pins').send(pin)
     },
     onSuccess: async () => {
-      queryClient.invalidateQueries({ queryKey: ['pins'] })
+      queryClient.invalidateQueries({ queryKey: ['pins', id] })
     },
   })
 }
-
-// export function usePinById(id: number) {
-//   return useQuery<Pin, Error>({
-//     queryKey: ['pins', id],
-//     queryFn: () => getPinById(id),
-//     enabled: !!id
-//   })
-// }
 
 export function useDeletePin() {
   const queryClient = useQueryClient()
@@ -74,14 +71,14 @@ export function useDeletePin() {
   })
 }
 
-export function useUpdatePin() {
+export function useUpdatePinById(id: number) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...pin }: Pin) => {
+    mutationFn: async (pin: PinData) => {
       await request.put(`/api/v1/pins/${id}`).send(pin)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pins'] })
+      queryClient.invalidateQueries({ queryKey: ['pins', id] })
     },
   })
 }
