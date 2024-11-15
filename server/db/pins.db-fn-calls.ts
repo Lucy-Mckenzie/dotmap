@@ -27,3 +27,9 @@ export async function updatePin(pin: Pin){
     .returning('*')
   return updatedPin
 }
+
+export async function getPinsByUser(user: string) {
+  console.log(user)
+  const pins = await db('pins').select('*').where({ user })
+  return pins as Pin[]
+}

@@ -10,7 +10,6 @@ const router = Router()
 router.get('/', async (req, res) => {
   try {
     const pins = await db.getAllPins()
-
     // res.json({ pins: pins.map((pin) => pin.name) })
     res.json(pins)
   } catch (error) {
@@ -22,7 +21,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const pin = await db.getPinById(req.params.id)
-    if (!pin){ throw new Error}
+    if (!pin){ throw new Error('Pin not found')}
     res.json(pin)
   } catch (err) {
     next(err)
@@ -36,7 +35,6 @@ router.post('/', async (req, res) => {
   //   res.sendStatus(StatusCodes.UNAUTHORIZED)
   //   return
   // }
-
   try {
     const { lat, long, name, description, user } = req.body
     if (!lat || !long ) {
@@ -83,5 +81,20 @@ router.patch('/:id', async (req, res) => {
     res.status(500).json({ message: 'An error occurred while updating the pin' });
   }
 })
+
+router.get('/user/:username', async (req, res) => {
+
+  try {
+    const pins = await db.getPinsByUser(req.params.username)
+
+    // res.json({ pins: pins.map((pin) => pin.name) })
+    res.json(pins)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: 'Something went wrong' })
+  }
+})
+
+
 
 export default router
